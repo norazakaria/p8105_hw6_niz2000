@@ -29,12 +29,17 @@ birthweight =
                   "Puerto Rican" = "4", "Other" = "8", "Unknown" = "9"),
     malform = as.factor(malform),
       malform = fct_recode(malform,
-               "absent" = "0", "present" = "1"),             
+                  "absent" = "0", "present" = "1"),             
     mrace = as.factor(mrace),
       mrace = fct_recode(mrace,
                   "white" = "1", "black" = "2", "asian" = "3", 
                   "Puerto Rican" = "4", "Other" = "8"))
 birthweight
+
+# Check for Missing Values
+missing_test = birthweight %>%
+  summarise_all((funs(sum(is.na(.))))) 
+missing_test
 ```
 The four categorical variables in the dataset, babysex, frace, malform, and mrace, were 
 colsums(is.na(birthweight))
