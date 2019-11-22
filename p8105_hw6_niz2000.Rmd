@@ -13,15 +13,31 @@ library(p8105.datasets)
 
 # Problem 1
 
-## Load in the Children's Birthweight Data
+## Load and Clean the Children's Birthweight Data
 ```{r}
+#Load and Tidy the Data
 birthweight = 
   read_csv(file = "./data/birthweight.csv") %>%
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  mutate(
+    babysex = as.factor(babysex),
+      babysex = fct_recode(babysex,
+                  "male" = "1", "female" = "2"),
+    frace = as.factor(frace),
+      frace = fct_recode(frace,
+                  "white" = "1", "black" = "2", "asian" = "3", 
+                  "Puerto Rican" = "4", "Other" = "8", "Unknown" = "9"),
+    malform = as.factor(malform),
+      malform = fct_recode(malform,
+               "absent" = "0", "present" = "1"),             
+    mrace = as.factor(mrace),
+      mrace = fct_recode(mrace,
+                  "white" = "1", "black" = "2", "asian" = "3", 
+                  "Puerto Rican" = "4", "Other" = "8"))
 birthweight
 ```
-babysex, frace, malform, mrace, 
-
+The four categorical variables in the dataset, babysex, frace, malform, and mrace, were 
+colsums(is.na(birthweight))
 
 # Problem 2
 
