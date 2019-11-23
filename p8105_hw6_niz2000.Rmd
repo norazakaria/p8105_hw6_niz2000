@@ -147,7 +147,7 @@ There are `r nrow(weather_df)` observations and `r ncol(weather_df)` variables i
 
 ## Central Park Weather Bootstrap Data Frame
 
-```{r}
+```{r Weather Bootstrap}
 weather_bootstrap = weather_df %>%
   modelr::bootstrap(n = 5000) %>%
   mutate(
@@ -158,11 +158,33 @@ weather_bootstrap = weather_df %>%
 The resulting weather_bootstrap dataframe consists of 5000 bootstrap samples. The underlying simple linear regression model displays tmax as the response, and tmin as the predictor of interest.
 
 
-## Distribution of r̂ 2 and log(β̂ 0∗β̂ 1)
+## Distribution of log(β̂ 0∗β̂ 1)
 
-```{r}
-
+```{r Log(Beta0*Beta1) Plot}
+logbeta_plot = weather_bootstrap %>%
+  mutate(results = map(models, broom::tidy)) %>%
+  select(results) %>%
+  unnest(results) %>%
+  select(term, estimate) %>%
+  pivot_wider(
+    names_from = "term",
+    values_from = "estimate") %>%
+  unnest() %>%
+  janitor::clean_names() %>%
+  mutate(intercept_beta1 = intercept + tmin) %>%
+  ggplot(aes(x = intercept_beta1)) +
+    geom_density() +
+    labs(
+      title = "Distribution of Beta0*Beta1",
+      x = "Beta0*Beta1",
+      y = "Density") +
+    viridis::scale_color_viridis(discrete = TRUE) +
+    theme(plot.title = element_text(hjust = 0.5))
+logbeta_plot
 ```
+
+
+## Distribution of r̂ 2
 
 
 We’ll focus on a simple linear regression with tmax as the response and tmin as the predictor, and are interested in the distribution of two quantities estimated from these data:
