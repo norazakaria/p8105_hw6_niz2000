@@ -186,12 +186,26 @@ logbeta_plot
 
 ## Distribution of r̂ 2
 
+```{r R^2 Plot}
+r_squared_plot = weather_bootstrap %>%
+  mutate(results = map(models, broom::glance)) %>%
+  select(results) %>%
+  unnest(results) %>%
+  ggplot(aes(x = r.squared)) +
+    geom_density() +
+    labs(
+      title = "Distribution of R^2",
+      x = "R^2",
+      y = "Density") +
+    viridis::scale_color_viridis(discrete = TRUE) +
+    theme(plot.title = element_text(hjust = 0.5))
+r_squared_plot
+```
 
-We’ll focus on a simple linear regression with tmax as the response and tmin as the predictor, and are interested in the distribution of two quantities estimated from these data:
 
-r̂ 2
-log(β̂ 0∗β̂ 1)
 
-Use 5000 bootstrap samples and, for each bootstrap sample, produce estimates of these two quantities. Plot the distribution of your estimates, and describe these in words. Using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for r̂ 2 and log(β̂ 0∗β̂ 1). Note: broom::glance() is helpful for extracting r̂ 2 from a fitted regression, and broom::tidy() (with some additional wrangling) should help in computing log(β̂ 0∗β̂ 1).
+describe these in words
+
+using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for r̂ 2 and log(β̂ 0∗β̂ 1)
 
 
