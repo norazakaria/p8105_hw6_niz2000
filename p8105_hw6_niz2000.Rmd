@@ -41,8 +41,7 @@ missing_test = birthweight %>%
   summarise_all((funs(sum(is.na(.))))) 
 missing_test
 ```
-The four categorical variables in the dataset, babysex, frace, malform, and mrace, were 
-colsums(is.na(birthweight))
+The four categorical variables in the dataset, babysex, frace, malform, and mrace, were converted from numeric to factor variables. These factors were also recoded in order for variable codes to be more descriptive. For example in the babysex variable, the factors now display male and female, opposed to 1 and 2. After tidying, the missing_test dataframe was created to detect if there are any missing values in the dataset. As we see in the missing_test outputted table, there are 0 missing values in each of the variable columns.
 
 # Problem 2
 
