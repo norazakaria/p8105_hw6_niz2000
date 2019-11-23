@@ -16,7 +16,8 @@ library(p8105.datasets)
 # Problem 1
 
 ## Load and Tidy the Birthweight Data
-```{r Warning = FALSE}
+
+```{r warning=FALSE}
 #Load and Tidy the Data
 birthweight = 
   read_csv(file = "./data/birthweight.csv") %>%
@@ -51,7 +52,7 @@ The four categorical variables in the dataset, babysex, frace, malform, and mrac
 
 In this linear regression model for the birthweight (bwt) outcome, predictors include mother's pre-pregnancy BMI (ppbmi), mother’s weight gain during pregnancy in pounds (wtgain), mother's age at delivery in years (momage), the number of live births prior to this pregnancy (parity), and the average number of cigarettes smoked per day during pregnancy (smoken). These variables were selected based on previous academic literature findings on the factors that underly birthweight. In addition to mother's starting weight, weight gain during preganancy, and age, birth order and behavioral factors such as smoking all contribute to the birthweight of a newborn. 
 
-```{r Linear Model}
+```{r Fit Linear Model}
 fit = lm(bwt ~ ppbmi + wtgain + momage + parity + smoken, data = birthweight)
 fit
 
@@ -82,8 +83,30 @@ birthweight %>%
     viridis::scale_color_viridis(discrete = TRUE) 
 ```
 
-
 The scatterplot of residuals against fitted values is concentrated around fitted values from 2800 to 33000, and residual values from -1000 to 1000.
+
+
+## Comparing Models
+
+Next, the "fit" model will be compared to two additional models:
+
+* The "length_age_fit" model, including length at birth and gestational age as predictors; and
+* The "interaction_terms_fit" model, including head circumference, length at birth, sex, and all interacting terms as predictors.
+
+### Predictors: Length at Birth and Gestational Age
+
+```{r Length_Age_Fit Model}
+length_age_fit = lm(bwt ~ blength + gaweeks, data = birthweight)
+```
+
+### Predictors: Head Circumference, Length, Sex, and Interacting Terms
+
+```{r Interaction_Terms_Fit Model}
+interaction_terms_fit = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + blength*babysex + bhead*blength*babysex, data = birthweight)
+```
+
+
+Make this comparison in terms of the cross-validated prediction error; use crossv_mc and functions in purrr as appropriate.
 
 
 # Problem 2
