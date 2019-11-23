@@ -86,7 +86,7 @@ birthweight %>%
 The scatterplot of residuals against fitted values is concentrated around fitted values from 2800 to 33000, and residual values from -1000 to 1000.
 
 
-## Comparing Models
+## Comparing Fit Models
 
 Next, the "fit" model will be compared to two additional models:
 
@@ -97,14 +97,28 @@ Next, the "fit" model will be compared to two additional models:
 
 ```{r Length_Age_Fit Model}
 length_age_fit = lm(bwt ~ blength + gaweeks, data = birthweight)
+length_age_fit
 ```
+
+As there are no interaction terms, the length_age_fit regression model outputs an intercept, and two coefficients for each predictor.
+
 
 ### Predictors: Head Circumference, Length, Sex, and Interacting Terms
 
 ```{r Interaction_Terms_Fit Model}
 interaction_terms_fit = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + blength*babysex + bhead*blength*babysex, data = birthweight)
+interaction_terms_fit
 ```
 
+As there are interaction terms, the interaction_terms_fit regression model outputs an intercept, and seven coefficients, three for each predictor, three for interaction terms between two predictors, and one coefficient for the interactiont term between all three predictors.
+
+
+### Comparing Cross-Validated Prediction Errors
+
+```{r}
+birthweight %>%
+  
+```
 
 Make this comparison in terms of the cross-validated prediction error; use crossv_mc and functions in purrr as appropriate.
 
