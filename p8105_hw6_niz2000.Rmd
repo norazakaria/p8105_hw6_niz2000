@@ -43,6 +43,15 @@ missing_test
 ```
 The four categorical variables in the dataset, babysex, frace, malform, and mrace, were converted from numeric to factor variables. These factors were also recoded in order for variable codes to be more descriptive. For example in the babysex variable, the factors now display male and female, opposed to 1 and 2. After tidying, the missing_test dataframe was created to detect if there are any missing values in the dataset. As we see in the missing_test outputted table, there are 0 missing values in each of the variable columns.
 
+## Regression Model for Birthweight
+
+In this linear regression model for the birthweight (bwt) outcome, predictors include mother's pre-pregnancy BMI (ppbmi), mother’s weight gain during pregnancy in pounds (wtgain), mother's age at delivery in years (momage), the number of live births prior to this pregnancy (parity), and the average number of cigarettes smoked per day during pregnancy (smoken). These variables were selected based on previous academic literature findings on the factors that underly birthweight. In addition to mother's starting weight, weight gain during preganancy, and age, birth order and behavioral factors such as smoking all contribute to the birthweight of a newborn. 
+```{r}
+fit = lm(bwt ~ ppbmi + wtgain + momage + parity + smoken, data = birthweight)
+```
+
+
+
 # Problem 2
 
 ## Load 2017 Central Park NOAA Weather Data
