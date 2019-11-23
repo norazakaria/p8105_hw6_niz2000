@@ -126,6 +126,7 @@ Make this comparison in terms of the cross-validated prediction error; use cross
 # Problem 2
 
 ## Load 2017 Central Park NOAA Weather Data
+
 ```{r}
 weather_df = 
   rnoaa::meteo_pull_monitors(
@@ -138,6 +139,37 @@ weather_df =
     tmin = tmin / 10,
     tmax = tmax / 10) %>%
   select(name, id, everything())
+weather_df
 ```
+
+There are `r nrow(weather_df)` observations and `r ncol(weather_df)` variables in the NOAA weather dataset for Central Park. Key variables for subsequent analyses include "tmin" and "tmax."
+
+
+## Central Park Weather Bootstrap Data Frame
+
+```{r}
+weather_bootstrap = weather_df %>%
+  modelr::bootstrap(n = 5000) %>%
+  mutate(
+    models = map(strap, ~ lm(tmax ~ tmin, data = .x)))
+ weather_bootstrap
+```
+
+The resulting weather_bootstrap dataframe consists of 5000 bootstrap samples. The underlying simple linear regression model displays tmax as the response, and tmin as the predictor of interest.
+
+
+## Distribution of r̂ 2 and log(β̂ 0∗β̂ 1)
+
+```{r}
+
+```
+
+
+We’ll focus on a simple linear regression with tmax as the response and tmin as the predictor, and are interested in the distribution of two quantities estimated from these data:
+
+r̂ 2
+log(β̂ 0∗β̂ 1)
+
+Use 5000 bootstrap samples and, for each bootstrap sample, produce estimates of these two quantities. Plot the distribution of your estimates, and describe these in words. Using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for r̂ 2 and log(β̂ 0∗β̂ 1). Note: broom::glance() is helpful for extracting r̂ 2 from a fitted regression, and broom::tidy() (with some additional wrangling) should help in computing log(β̂ 0∗β̂ 1).
 
 
