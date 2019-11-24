@@ -215,12 +215,13 @@ logbeta_plot = weather_bootstrap %>%
     values_from = "estimate") %>%
   unnest() %>%
   janitor::clean_names() %>%
-  mutate(intercept_beta1 = intercept + tmin) %>%
-  ggplot(aes(x = intercept_beta1)) +
+  mutate(intercept_beta1 = intercept*tmin,
+         log_intercept_beta1 = log(intercept_beta1)) %>%
+  ggplot(aes(x = log_intercept_beta1)) +
     geom_density() +
     labs(
       title = "Distribution of Beta0*Beta1",
-      x = "Beta0*Beta1",
+      x = "Log(Beta0*Beta1)",
       y = "Density") +
     viridis::scale_color_viridis(discrete = TRUE) +
     theme(plot.title = element_text(hjust = 0.5))
@@ -229,13 +230,27 @@ logbeta_plot
 
 ADD DESCRIPTION
 
-### 95% CI 
+### 95% CI of log(β̂ 0∗β̂ 1)
 
-```{r}
-
+```{r warning=FALSE}
+weather_bootstrap %>%
+  mutate(results = map(models, broom::tidy)) %>%
+  select(results) %>%
+  unnest(results) %>%
+  select(term, estimate) %>%
+  pivot_wider(
+    names_from = "term",
+    values_from = "estimate") %>%
+  unnest() %>%
+  janitor::clean_names() %>%
+  mutate(intercept_beta1 = intercept*tmin,
+    log_intercept_beta1 = log(intercept_beta1)) %>%
+  pull(log_intercept_beta1) %>%
+  as.vector() %>%
+  quantile(probs = c(0.025, 0.975), na.rm = TRUE)
 ```
 
-quantile(pull(weather_bootstrap, intercept_beta1), probs = c(.025, 0.975))
+The 95% confidence interval for the  log(β̂ 0∗β̂ 1) is (1.97, 2.06).
 
 
 ## Distribution of r̂ 2
@@ -258,20 +273,17 @@ r_squared_plot
 
 ADD DESCRIPTION
 
-### 95% CI 
+### 95% CI of r̂ 2
 
 ```{r}
-
+weather_bootstrap %>%
+  mutate(
+    results = map(models, broom::glance)) %>%
+  select(results) %>%
+  unnest(results) %>%
+  pull(r.squared) %>%
+  as.vector() %>%
+  quantile(probs = c(0.025, 0.975), na.rm = TRUE)
 ```
 
-r_squared_plot %>%
-qdata(.025,r.squared)
-
-r_squared_plot %>%
-  pull(r.squared) %>%
-  as.vector(r.squared) %>%
-  quantile(r.squared, probs=c(0.025, 0.975), na.rm=TRUE)
-
-using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for r̂ 2 and log(β̂ 0∗β̂ 1)
-
-
+The 95% confidence interval for the r.squared value is (0.89, 0.93).
