@@ -65,7 +65,7 @@ fit
 
 fit_summary_table = fit %>%
   broom::tidy() %>%
-  knitr::kable(digits = 3) 
+  knitr::kable(digits = 3, format = 'pandoc', caption = "Fit Linear Model Statistics") 
 fit_summary_table
 ```
 
