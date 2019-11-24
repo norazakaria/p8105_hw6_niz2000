@@ -10,6 +10,7 @@ output: github_document
 ```{r}
 library(tidyverse)
 library(p8105.datasets)
+library(modelr)
 ```
 
 
@@ -95,9 +96,9 @@ Next, the "fit" model will be compared to two additional models:
 
 ### Predictors: Length at Birth and Gestational Age
 
-```{r Length_Age_Fit Model}
-length_age_fit = lm(bwt ~ blength + gaweeks, data = birthweight)
-length_age_fit
+```{r Main_Effects_Fit Model}
+main_effects_fit = lm(bwt ~ blength + gaweeks, data = birthweight)
+main_effects_fit 
 ```
 
 As there are no interaction terms, the length_age_fit regression model outputs an intercept, and two coefficients for each predictor.
@@ -105,9 +106,10 @@ As there are no interaction terms, the length_age_fit regression model outputs a
 
 ### Predictors: Head Circumference, Length, Sex, and Interacting Terms
 
-```{r Interaction_Terms_Fit Model}
-interaction_terms_fit = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + blength*babysex + bhead*blength*babysex, data = birthweight)
-interaction_terms_fit
+```{r Interaction_Fit Model}
+interaction_fit = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + 
+  blength*babysex + bhead*blength*babysex, data = birthweight)
+interaction_fit
 ```
 
 As there are interaction terms, the interaction_terms_fit regression model outputs an intercept, and seven coefficients, three for each predictor, three for interaction terms between two predictors, and one coefficient for the interactiont term between all three predictors.
@@ -115,9 +117,44 @@ As there are interaction terms, the interaction_terms_fit regression model outpu
 
 ### Comparing Cross-Validated Prediction Errors
 
+In order to compare the "fit," "main_effects_fit," and "interaction_fit" model, cross-validation will be emplored. Cross validation provides a way to compare the predictive performance of competing methods.
+
 ```{r}
-birthweight %>%
-  
+cv_df = 
+  crossv_mc(birthweight, 100) %>%
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble))
+```
+
+
+```{r Cross Validation}
+cv_df = cv_df %>%
+  mutate(
+    fit = map(train, ~lm(bwt ~ blength + gaweeks, data = .x)),
+    main_effects_fit  = map(train, ~lm(bwt ~ blength + gaweeks, data = .x)),
+    interaction_fit = map(train, ~lm(bwt ~ bhead + blength + babysex + bhead*blength + 
+        bhead*babysex + blength*babysex + bhead*blength*babysex, data = birthweight))) %>%
+  mutate(
+    rmse_fit = map2_dbl(fit, test, ~rmse(model = .x, data = .y)),
+    rmse_main_effects = map2_dbl(main_effects_fit, test, ~rmse(model = .x, data = .y)),
+    rmse_interaction = map2_dbl(interaction_fit, test, ~rmse(model = .x, data = .y)))
+ 
+cv_df %>%
+  select(starts_with("rmse")) %>%
+  pivot_longer(
+    everything(),
+    names_to = "model",
+    values_to = "rmse",
+    names_prefix = "rsme_") %>%
+  mutate(model = fct_inorder(model)) %>%
+  ggplot(aes(x = model, y = rmse)) +
+    geom_violin() +
+    labs(
+      title = "Cross-Validated Prediction Errors",
+      x = "Model",
+      y = "RMSE")  +
+    viridis::scale_color_viridis(discrete = TRUE) 
 ```
 
 Make this comparison in terms of the cross-validated prediction error; use crossv_mc and functions in purrr as appropriate.
@@ -155,7 +192,7 @@ weather_bootstrap = weather_df %>%
  weather_bootstrap
 ```
 
-The resulting weather_bootstrap dataframe consists of 5000 bootstrap samples. The underlying simple linear regression model displays tmax as the response, and tmin as the predictor of interest.
+The resulting weather_bootstrap dataframe consists of 5,000 bootstrap samples. The underlying simple linear regression model displays tmax as the response, and tmin as the predictor of interest.
 
 
 ## Distribution of log(β̂ 0∗β̂ 1)
@@ -184,6 +221,9 @@ logbeta_plot
 ```
 
 
+quantile(pull(weather_bootstrap, intercept_beta1), probs = c(.025, 0.975))
+
+
 ## Distribution of r̂ 2
 
 ```{r R^2 Plot}
@@ -201,6 +241,19 @@ r_squared_plot = weather_bootstrap %>%
     theme(plot.title = element_text(hjust = 0.5))
 r_squared_plot
 ```
+
+
+### 95% CI 
+
+r_squared_plot %>%
+qdata(.025,r.squared)
+
+
+r_squared_plot %>%
+  pull(r.squared) %>%
+  as.vector(r.squared) %>%
+  quantile(r.squared, probs=c(0.025, 0.975), na.rm=TRUE)
+
 
 
 
