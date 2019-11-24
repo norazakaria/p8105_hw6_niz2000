@@ -40,17 +40,19 @@ birthweight =
 birthweight
 ```
 
-The four categorical variables in the dataset, babysex, frace, malform, and mrace, were converted from numeric to factor variables. These factors were also recoded in order for variable codes to be more descriptive. For example in the babysex variable, the factors now display male and female, opposed to 1 and 2. There are `r nrow(birthweight)` observations and `r ncol(birthweight)` variables in the birthweight dataset.
+The four categorical variables in the dataset: babysex, frace, malform, and mrace, were converted from numeric to factor variables. These factors were also recoded in order for variable codes to be more descriptive. For example in the babysex variable, the factors now display "male" and "female," opposed to 1 and 2. There are `r nrow(birthweight)` observations and `r ncol(birthweight)` variables in the birthweight dataset.
 
 ### Test for Missing Values
 
-```{r Test for Missing Values}
+After tidying, the missing_test dataframe was created to detect if there are any missing values in the dataset.
+
+```{r warning=FALSE}
 missing_test = birthweight %>%
   summarise_all((funs(sum(is.na(.))))) 
 missing_test
 ```
 
-After tidying, the missing_test dataframe was created to detect if there are any missing values in the dataset. As we see in the missing_test outputted table, there are 0 missing values in each of the variable columns.
+As we see in the missing_test outputted table, there are 0 missing values in each of the variable columns, indicating that there are no missing values in the birthweight dataset.
 
 
 ## Regression Model for Birthweight
@@ -67,7 +69,7 @@ fit_summary_table = fit %>%
 fit_summary_table
 ```
 
-The linear model summary table provides the regression coefficients, standard error, test statistic, and p-value for all predictors in our model. All p-values were less than 0.05, apart from the "parity" variable, therefore "parity" is the only predictor in our model that is not statistically significant. Additionally, our regression coefficients for "parity" and "smoken" are negative, therefore demonstrating a negative linear relationship between the predictor and our birthweight outcome.
+The linear model summary table provides the regression coefficients, standard error, test statistic, and p-value for all predictors in our model. All p-values were less than 0.05, apart from the "parity" variable, therefore "parity" is the only predictor in our model that is not statistically significant. Additionally, our regression coefficients for "parity" and "smoken" are negative, therefore demonstrating a negative linear relationship between the predictor and our birthweight outcome, with the remaining variables demonstrating a positive linear association. 
 
 
 ## Plot of Model Residuals and Fitted Values
@@ -88,7 +90,7 @@ birthweight %>%
     viridis::scale_color_viridis(discrete = TRUE) 
 ```
 
-The scatterplot of residuals against fitted values is concentrated around fitted values from 2800 to 33000, and residual values from -1000 to 1000.
+The scatterplot of residuals against fitted values is concentrated around fitted values from 2800 to 33000, and residual values from -1000 to 1000. ADD DESCRIPTIONS
 
 
 ## Comparing Fit Models
@@ -117,7 +119,7 @@ interaction_fit = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*bab
 interaction_fit
 ```
 
-As there are interaction terms, the interaction_terms_fit regression model outputs an intercept, and seven coefficients, three for each predictor, three for interaction terms between two predictors, and one coefficient for the interactiont term between all three predictors.
+As there are interaction terms, the interaction_terms_fit regression model outputs an intercept, and seven coefficients, three for each predictor, three for interaction terms between two predictors, and one coefficient for the interaction term between all three predictors.
 
 
 ### Comparing Cross-Validated Prediction Errors
@@ -153,16 +155,16 @@ cv_df %>%
     values_to = "rmse",
     names_prefix = "rsme_") %>%
   mutate(model = fct_inorder(model)) %>%
-  ggplot(aes(x = model, y = rmse)) +
+  ggplot(aes(x = model, y = rmse, color = model)) +
     geom_violin() +
     labs(
       title = "Cross-Validated Prediction Errors",
       x = "Model",
-      y = "RMSE")  +
+      y = "RMSE") +
     viridis::scale_color_viridis(discrete = TRUE) 
 ```
 
-Make this comparison in terms of the cross-validated prediction error; use crossv_mc and functions in purrr as appropriate.
+Make this comparison in terms of the cross-validated prediction error; use crossv_mc and functions in purrr as appropriate. ADD DESCRIPTION.
 
 
 # Problem 2
@@ -197,7 +199,7 @@ weather_bootstrap = weather_df %>%
  weather_bootstrap
 ```
 
-The resulting weather_bootstrap dataframe consists of 5,000 bootstrap samples. The underlying simple linear regression model displays tmax as the response, and tmin as the predictor of interest.
+The resulting weather_bootstrap dataframe consists of 5,000 bootstrap samples. The underlying simple linear regression model displays "tmax" as the response, and "tmin" as the predictor of interest.
 
 
 ## Distribution of log(β̂ 0∗β̂ 1)
@@ -225,6 +227,13 @@ logbeta_plot = weather_bootstrap %>%
 logbeta_plot
 ```
 
+ADD DESCRIPTION
+
+### 95% CI 
+
+```{r}
+
+```
 
 quantile(pull(weather_bootstrap, intercept_beta1), probs = c(.025, 0.975))
 
@@ -247,22 +256,21 @@ r_squared_plot = weather_bootstrap %>%
 r_squared_plot
 ```
 
+ADD DESCRIPTION
 
 ### 95% CI 
 
+```{r}
+
+```
+
 r_squared_plot %>%
 qdata(.025,r.squared)
-
 
 r_squared_plot %>%
   pull(r.squared) %>%
   as.vector(r.squared) %>%
   quantile(r.squared, probs=c(0.025, 0.975), na.rm=TRUE)
-
-
-
-
-describe these in words
 
 using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for r̂ 2 and log(β̂ 0∗β̂ 1)
 
