@@ -5,7 +5,7 @@ date: "11/25/2019"
 output: github_document
 ---
 
-## Load Tidyverse and Class Datasets
+## Load Tidyverse, Modelr, and Class Datasets
 
 ```{r}
 library(tidyverse)
@@ -19,7 +19,6 @@ library(modelr)
 ## Load and Tidy the Birthweight Data
 
 ```{r warning=FALSE}
-#Load and Tidy the Data
 birthweight = 
   read_csv(file = "./data/birthweight.csv") %>%
   janitor::clean_names() %>%
@@ -39,14 +38,19 @@ birthweight =
                   "white" = "1", "black" = "2", "asian" = "3", 
                   "Puerto Rican" = "4", "Other" = "8"))
 birthweight
+```
 
-# Check for Missing Values
+The four categorical variables in the dataset, babysex, frace, malform, and mrace, were converted from numeric to factor variables. These factors were also recoded in order for variable codes to be more descriptive. For example in the babysex variable, the factors now display male and female, opposed to 1 and 2. There are `r nrow(birthweight)` observations and `r ncol(birthweight)` variables in the birthweight dataset.
+
+### Test for Missing Values
+
+```{r Test for Missing Values}
 missing_test = birthweight %>%
   summarise_all((funs(sum(is.na(.))))) 
 missing_test
 ```
 
-The four categorical variables in the dataset, babysex, frace, malform, and mrace, were converted from numeric to factor variables. These factors were also recoded in order for variable codes to be more descriptive. For example in the babysex variable, the factors now display male and female, opposed to 1 and 2. After tidying, the missing_test dataframe was created to detect if there are any missing values in the dataset. As we see in the missing_test outputted table, there are 0 missing values in each of the variable columns.
+After tidying, the missing_test dataframe was created to detect if there are any missing values in the dataset. As we see in the missing_test outputted table, there are 0 missing values in each of the variable columns.
 
 
 ## Regression Model for Birthweight
@@ -91,10 +95,11 @@ The scatterplot of residuals against fitted values is concentrated around fitted
 
 Next, the "fit" model will be compared to two additional models:
 
-* The "length_age_fit" model, including length at birth and gestational age as predictors; and
-* The "interaction_terms_fit" model, including head circumference, length at birth, sex, and all interacting terms as predictors.
+* The "main_effects_fit" model, including length at birth and gestational age as predictors; and
+* The "interaction_fit" model, including head circumference, length at birth, sex, and all interacting terms as predictors.
 
-### Predictors: Length at Birth and Gestational Age
+
+### Predictors: Length at Birth and Gestational Age Main Effects
 
 ```{r Main_Effects_Fit Model}
 main_effects_fit = lm(bwt ~ blength + gaweeks, data = birthweight)
@@ -104,7 +109,7 @@ main_effects_fit
 As there are no interaction terms, the length_age_fit regression model outputs an intercept, and two coefficients for each predictor.
 
 
-### Predictors: Head Circumference, Length, Sex, and Interacting Terms
+### Predictors: Head Circumference, Length, Sex, and All Interacting Terms
 
 ```{r Interaction_Fit Model}
 interaction_fit = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + 
