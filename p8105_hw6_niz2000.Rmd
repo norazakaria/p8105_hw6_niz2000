@@ -212,7 +212,7 @@ The resulting weather_bootstrap dataframe consists of 5,000 bootstrap samples. T
 
 ## Distribution of log(β̂ 0∗β̂ 1)
 
-```{r Log(Beta0*Beta1) Plot}
+```{r Log(Beta0*Beta1) Plot, warning=FALSE}
 logbeta_plot = weather_bootstrap %>%
   mutate(results = map(models, broom::tidy)) %>%
   select(results) %>%
@@ -294,4 +294,4 @@ weather_bootstrap %>%
   quantile(probs = c(0.025, 0.975), na.rm = TRUE)
 ```
 
-The 95% confidence interval for the "r.squared" value is (0.89, 0.93). . In other words, we are 95% confident that the true value of r-squared in the central park weather data is between 0.89 and 0.93.
+The 95% confidence interval for the "r.squared" value is (0.89, 0.93). In other words, we are 95% confident that the true value of r-squared in the central park weather data is between 0.89 and 0.93.
