@@ -18,12 +18,14 @@ library(modelr)
 
 ## Load and Tidy the Birthweight Data
 
+The birthweight data was gathered to understand the effects of several variables on a child’s birthweight.
+
 ```{r warning=FALSE}
 birthweight = 
   read_csv(file = "./data/birthweight.csv") %>%
   janitor::clean_names() %>%
   mutate(
-    babysex = as.factor(babysex),
+      babysex = as.factor(babysex),
       babysex = fct_recode(babysex,
                   "male" = "1", "female" = "2"),
     frace = as.factor(frace),
@@ -40,7 +42,7 @@ birthweight =
 birthweight
 ```
 
-The four categorical variables in the dataset: babysex, frace, malform, and mrace, were converted from numeric to factor variables. These factors were also recoded in order for variable codes to be more descriptive. For example in the babysex variable, the factors now display "male" and "female," opposed to 1 and 2. There are `r nrow(birthweight)` observations and `r ncol(birthweight)` variables in the birthweight dataset.
+The four categorical variables in the dataset: "babysex," "frace," "malform," and "mrace," were converted from numeric to factor variables. These factors were also recoded in order for variable codes to be more descriptive. For example in the babysex variable, the factors now display "male" and "female," opposed to 1 and 2. There are `r nrow(birthweight)` observations and `r ncol(birthweight)` variables in the birthweight dataset.
 
 ### Test for Missing Values
 
@@ -48,7 +50,8 @@ After tidying, the missing_test dataframe was created to detect if there are any
 
 ```{r warning=FALSE}
 missing_test = birthweight %>%
-  summarise_all((funs(sum(is.na(.))))) 
+  summarise_all((funs(sum(is.na(.))))) %>%
+  knitr::kable(digits = 3, format = 'pandoc', caption = "Test for Missing Values") 
 missing_test
 ```
 
@@ -57,7 +60,7 @@ As we see in the missing_test outputted table, there are 0 missing values in eac
 
 ## Regression Model for Birthweight
 
-In this linear regression model for the birthweight (bwt) outcome, predictors include mother's pre-pregnancy BMI (ppbmi), mother’s weight gain during pregnancy in pounds (wtgain), mother's age at delivery in years (momage), the number of live births prior to this pregnancy (parity), and the average number of cigarettes smoked per day during pregnancy (smoken). These variables were selected based on previous academic literature findings on the factors that underly birthweight. In addition to mother's starting weight, weight gain during preganancy, and age, birth order and behavioral factors such as smoking all contribute to the birthweight of a newborn. 
+In this linear regression model for the birthweight (bwt) outcome, predictors include mother's pre-pregnancy BMI (ppbmi), mother’s weight gain during pregnancy in pounds (wtgain), mother's age at delivery in years (momage), the number of live births prior to this pregnancy (parity), and the average number of cigarettes smoked per day during pregnancy (smoken). These variables were selected based on previous academic literature findings on the factors that underly birthweight, including information from the World Health Organization and Stanford University. In addition to mother's starting weight, weight gain during preganancy, and age, birth order and behavioral factors such as smoking all contribute to the birthweight of a newborn. 
 
 ```{r Fit Linear Model}
 fit = lm(bwt ~ ppbmi + wtgain + momage + parity + smoken, data = birthweight)
@@ -73,6 +76,8 @@ The linear model summary table provides the regression coefficients, standard er
 
 
 ## Plot of Model Residuals and Fitted Values
+
+Residuals and fitted values can be examined as diagnostics to identify model fit. In linear regression, residuals measure the difference between the observed value of the outcome and the predicted value of the outcome. Fitted values, or predictions, model the values that come out of the estimation process that the fit model outputs.
 
 ```{r Model Plot}
 modelr::add_predictions(birthweight, fit)
@@ -90,7 +95,7 @@ birthweight %>%
     viridis::scale_color_viridis(discrete = TRUE) 
 ```
 
-The scatterplot of residuals against fitted values is concentrated around fitted values from 2800 to 33000, and residual values from -1000 to 1000. ADD DESCRIPTIONS
+The points on the scatterplot of residuals against fitted values are concentrated around fitted values from 2800 to 33000, and residual values evenly spread around 0 from -1000 to 1000. As the residuals vary evenly above and below the 0 line, this suggest that the assumption that the relationship is linear may be reasonable. However, there do appear to be outliers in the plot. 
 
 
 ## Comparing Fit Models
@@ -108,7 +113,7 @@ main_effects_fit = lm(bwt ~ blength + gaweeks, data = birthweight)
 main_effects_fit 
 ```
 
-As there are no interaction terms, the length_age_fit regression model outputs an intercept, and two coefficients for each predictor.
+As there are no interaction terms, the "length_age_fit" regression model outputs an intercept, and two coefficients for each predictor, length at birth and gestational age.
 
 
 ### Predictors: Head Circumference, Length, Sex, and All Interacting Terms
@@ -119,12 +124,12 @@ interaction_fit = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*bab
 interaction_fit
 ```
 
-As there are interaction terms, the interaction_terms_fit regression model outputs an intercept, and seven coefficients, three for each predictor, three for interaction terms between two predictors, and one coefficient for the interaction term between all three predictors.
+As there are interaction terms, the "interaction_terms_fit" regression model outputs an intercept, and seven coefficients. There are three coefficients for for each head circumference, length, and sex predictor, three for interaction terms between two of the predictors, and one coefficient for the interaction term between all three predictors.
 
 
 ### Comparing Cross-Validated Prediction Errors
 
-In order to compare the "fit," "main_effects_fit," and "interaction_fit" model, cross-validation will be emplored. Cross validation provides a way to compare the predictive performance of competing methods.
+In order to compare the "fit," "main_effects_fit," and "interaction_fit" models, cross-validation will be emplored. Cross validation provides a way to compare the predictive performance of competing methods. In this case, models will be compared based on root mean squared errors (RMSEs). 
 
 ```{r}
 cv_df = 
@@ -134,6 +139,7 @@ cv_df =
     test = map(test, as_tibble))
 ```
 
+The "crossv_mc" automates elements of the cross-validation process by reforms the testing split multiple times, and stores the datasets using list columns. This step is coerced to a dataframe called "cv_df," and can be treated like a dataframe moving forward. 
 
 ```{r Cross Validation}
 cv_df = cv_df %>%
@@ -164,7 +170,7 @@ cv_df %>%
     viridis::scale_color_viridis(discrete = TRUE) 
 ```
 
-Make this comparison in terms of the cross-validated prediction error; use crossv_mc and functions in purrr as appropriate. ADD DESCRIPTION.
+The Cross-Validated Prediction Errors plot provides a violin plot of RMSE values for each of the three models: the fit model, the main effects model, and the interaction terms model. From these violin plots of variance in prediction error, we can compare prediction error distributions across models. Based on these results, the interaction model (interaction_fit) is the best model with RMSE values around 285, as it has the lowest RMSE relative to the other two models, which both have high RMSE around 330 and are similar to each other in spread. 
 
 
 # Problem 2
