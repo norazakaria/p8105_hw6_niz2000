@@ -177,6 +177,8 @@ The Cross-Validated Prediction Errors plot provides a violin plot of RMSE values
 
 ## Load 2017 Central Park NOAA Weather Data
 
+The data used for this question is from the NOAA National Climatic Data Center, for Central Park, NYC.
+
 ```{r}
 weather_df = 
   rnoaa::meteo_pull_monitors(
@@ -234,11 +236,11 @@ logbeta_plot = weather_bootstrap %>%
 logbeta_plot
 ```
 
-ADD DESCRIPTION
+The density plot for the distribution of the log(β̂ 0∗β̂ 1 ) of the linear regression model appears to be normally distributed as it is fairly symmetrical around 2.02, with minimal or no apparent skewness. The peak of the distribution is slightly uneven. 
 
 ### 95% CI of log(β̂ 0∗β̂ 1)
 
-```{r warning=FALSE}
+```{r Log(Beta0*Beta1) Confidence Interval, warning=FALSE}
 weather_bootstrap %>%
   mutate(results = map(models, broom::tidy)) %>%
   select(results) %>%
@@ -256,7 +258,7 @@ weather_bootstrap %>%
   quantile(probs = c(0.025, 0.975), na.rm = TRUE)
 ```
 
-The 95% confidence interval for the  log(β̂ 0∗β̂ 1) is (1.97, 2.06).
+The 95% confidence interval for the log(β̂ 0∗β̂ 1) is (1.97, 2.06). In other words, we are 95% confident that the true value of log(β̂ 0∗β̂ 1) in the central park weather data is between 1.97 and 2.06.
 
 
 ## Distribution of r̂ 2
@@ -277,11 +279,11 @@ r_squared_plot = weather_bootstrap %>%
 r_squared_plot
 ```
 
-ADD DESCRIPTION
+The r-squared value is a statistical measure of how close the data follows the fitted regression line, or in other words, the percentage of variation in the the outcome variable that is explained by the model. The density plot for the distribution of the r-squared measures is fairly normally distributed, with slight left-skewedness, around an r-squared value of 0.9125. Because the density plot distribution is closer to 1 than 0, this indicates that the model explains much of the variability of the outcome data around its mean. 
 
 ### 95% CI of r̂ 2
 
-```{r}
+```{r R^2 Plot Confidence Interval}
 weather_bootstrap %>%
   mutate(
     results = map(models, broom::glance)) %>%
@@ -292,4 +294,4 @@ weather_bootstrap %>%
   quantile(probs = c(0.025, 0.975), na.rm = TRUE)
 ```
 
-The 95% confidence interval for the r.squared value is (0.89, 0.93).
+The 95% confidence interval for the "r.squared" value is (0.89, 0.93). . In other words, we are 95% confident that the true value of r-squared in the central park weather data is between 0.89 and 0.93.
